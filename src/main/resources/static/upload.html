@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YouTube - 업로드</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+        rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+
+    <style>
+        .upload-shell {
+            display: flex;
+            min-height: calc(100vh - 56px);
+        }
+
+        .upload-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .upload-page {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .upload-wizard-card {
+            background: linear-gradient(180deg, #181818 0%, #141414 100%);
+            border: 1px solid #272727;
+            border-radius: 28px;
+            padding: 28px;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+        }
+
+        .upload-header {
+            margin-bottom: 24px;
+        }
+
+        .upload-wizard-title {
+            margin: 0 0 10px;
+            font-size: 30px;
+            line-height: 1.2;
+            letter-spacing: -0.4px;
+            color: #fff;
+        }
+
+        .upload-wizard-subtitle {
+            margin: 0;
+            color: #a9a9a9;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .upload-step-indicators {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+        }
+
+        .upload-step-chip {
+            min-height: 40px;
+            padding: 0 16px;
+            border-radius: 999px;
+            border: 1px solid #303030;
+            background: #202020;
+            color: #bdbdbd;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+        }
+
+        .upload-step-chip.is-active {
+            background: #fff;
+            color: #111;
+            border-color: #fff;
+            font-weight: 700;
+        }
+
+        .upload-step-chip.is-complete {
+            background: #2f2f2f;
+            color: #fff;
+            border-color: #3a3a3a;
+        }
+
+        .upload-step-panel {
+            display: none;
+        }
+
+        .upload-step-panel.is-active {
+            display: block;
+        }
+
+        .upload-panel-title {
+            margin: 0 0 18px;
+            font-size: 20px;
+            color: #fff;
+        }
+
+        .upload-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+            gap: 22px;
+            align-items: start;
+        }
+
+        .upload-section {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            min-width: 0;
+        }
+
+        .upload-card {
+            background: #121212;
+            border: 1px solid #252525;
+            border-radius: 20px;
+            padding: 18px;
+        }
+
+        .upload-card-title {
+            margin: 0 0 14px;
+            font-size: 15px;
+            color: #f1f1f1;
+        }
+
+        .upload-field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .upload-field + .upload-field {
+            margin-top: 4px;
+        }
+
+        .upload-field label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #f1f1f1;
+        }
+
+        .upload-help-text {
+            color: #8e8e8e;
+            font-size: 12px;
+            line-height: 1.5;
+            margin-top: -2px;
+        }
+
+        .upload-input,
+        .upload-select,
+        .upload-textarea {
+            width: 100%;
+            border: 1px solid #303030;
+            background: #101010;
+            color: #fff;
+            border-radius: 14px;
+            outline: none;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+        }
+
+        .upload-input:focus,
+        .upload-select:focus,
+        .upload-textarea:focus {
+            border-color: #4a4a4a;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
+            background: #121212;
+        }
+
+        .upload-input,
+        .upload-select {
+            height: 48px;
+            padding: 0 14px;
+        }
+
+        .upload-textarea {
+            min-height: 150px;
+            resize: vertical;
+            padding: 14px;
+            line-height: 1.65;
+        }
+
+        .upload-file-box {
+            border: 1px dashed #3a3a3a;
+            border-radius: 18px;
+            padding: 20px;
+            background: #111;
+            transition: border-color 0.18s ease, background 0.18s ease;
+        }
+
+        .upload-file-box:hover {
+            background: #141414;
+            border-color: #4a4a4a;
+        }
+
+        .upload-file-box input[type="file"] {
+            width: 100%;
+            color: #fff;
+        }
+
+        .upload-file-name {
+            margin-top: 10px;
+            color: #aaaaaa;
+            font-size: 13px;
+            line-height: 1.5;
+            min-height: 20px;
+        }
+
+        .upload-thumb-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+        }
+
+        .upload-radio-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .upload-radio-option {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 40px;
+            padding: 0 14px;
+            border-radius: 999px;
+            border: 1px solid #303030;
+            background: #202020;
+            font-size: 13px;
+            color: #f1f1f1;
+        }
+
+        .upload-radio-option input {
+            accent-color: #fff;
+        }
+
+        .upload-preview-card,
+        .upload-summary-card {
+            background: #121212;
+            border: 1px solid #252525;
+            border-radius: 20px;
+            padding: 18px;
+        }
+
+        .upload-preview-title,
+        .upload-summary-title {
+            margin: 0 0 14px;
+            font-size: 15px;
+            color: #f1f1f1;
+        }
+
+        .upload-thumb-preview,
+        .upload-summary-thumb {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border-radius: 16px;
+            overflow: hidden;
+            background: linear-gradient(180deg, #0d0d0d, #131313);
+            border: 1px solid #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #7f7f7f;
+            text-align: center;
+            padding: 16px;
+            line-height: 1.6;
+        }
+
+        .upload-thumb-preview img,
+        .upload-summary-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .upload-summary-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .upload-summary-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #232323;
+        }
+
+        .upload-summary-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .upload-summary-label {
+            color: #aaaaaa;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .upload-summary-value {
+            text-align: right;
+            font-size: 14px;
+            color: #fff;
+            word-break: break-word;
+        }
+
+        .upload-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 26px;
+            flex-wrap: wrap;
+        }
+
+        .upload-actions-left,
+        .upload-actions-right {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .upload-link-btn,
+        .upload-cancel,
+        .upload-next,
+        .upload-submit {
+            min-width: 112px;
+            height: 42px;
+            padding: 0 16px;
+            border-radius: 999px;
+            border: 1px solid #303030;
+            background: #202020;
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+        }
+
+        .upload-link-btn:hover,
+        .upload-cancel:hover,
+        .upload-next:hover,
+        .upload-submit:hover {
+            transform: translateY(-1px);
+        }
+
+        .upload-submit,
+        .upload-next {
+            background: #fff;
+            color: #111;
+            border-color: #fff;
+            font-weight: 700;
+        }
+
+        .upload-submit[disabled],
+        .upload-next[disabled] {
+            opacity: 0.55;
+            cursor: default;
+            transform: none;
+        }
+
+        .upload-error-slot {
+            min-height: 22px;
+        }
+
+        .upload-file-error-slot {
+            min-height: 22px;
+            margin-top: 6px;
+        }
+
+        @media (max-width: 980px) {
+            .upload-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .upload-wizard-card {
+                padding: 18px;
+                border-radius: 22px;
+            }
+
+            .upload-wizard-title {
+                font-size: 25px;
+            }
+
+            .upload-panel-title {
+                font-size: 18px;
+            }
+
+            .upload-actions {
+                flex-direction: column;
+            }
+
+            .upload-actions-left,
+            .upload-actions-right {
+                width: 100%;
+            }
+
+            .upload-actions-left > *,
+            .upload-actions-right > * {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body data-page="upload">
+<header class="topbar">
+    <div class="topbar-left">
+        <a href="index.html" class="logo-wrap" aria-label="YouTube 홈">
+            <span class="logo-badge">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M10 15.5v-7l6 3.5-6 3.5Z" fill="#fff"></path>
+                </svg>
+            </span>
+            <span class="logo-text">YouTube</span>
+        </a>
+    </div>
+
+    <div class="topbar-center">
+        <form class="search-form" onsubmit="return false;">
+            <input type="text" placeholder="검색" aria-label="검색" />
+            <button type="submit" class="search-btn" aria-label="검색 버튼">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M10 4a6 6 0 1 0 3.87 10.58l4.27 4.27 1.41-1.41-4.27-4.27A6 6 0 0 0 10 4Zm0 2a4 4 0 1 1 0 8 4 4 0 0 1 0-8Z"></path>
+                </svg>
+            </button>
+        </form>
+    </div>
+
+    <div class="topbar-right">
+        <a href="channel.html" class="profile" aria-label="내 채널">T</a>
+    </div>
+</header>
+
+<div class="upload-shell">
+    <main class="upload-content">
+        <section class="upload-page">
+            <div class="upload-wizard-card">
+                <div class="upload-header">
+                    <h1 class="upload-wizard-title">새 영상 업로드</h1>
+                    <p class="upload-wizard-subtitle">
+                        파일 선택부터 정보 입력, 최종 확인까지 한 번에 진행할 수 있어.
+                    </p>
+                </div>
+
+                <div class="upload-step-indicators">
+                    <div class="upload-step-chip is-active" data-step-indicator>1단계 · 파일 선택</div>
+                    <div class="upload-step-chip" data-step-indicator>2단계 · 영상 정보</div>
+                    <div class="upload-step-chip" data-step-indicator>3단계 · 최종 확인</div>
+                </div>
+
+                <form id="uploadForm" novalidate>
+                    <!-- STEP 1 -->
+                    <section class="upload-step-panel is-active" data-step-panel="1">
+                        <h2 class="upload-panel-title">업로드할 파일을 준비해줘</h2>
+
+                        <div class="upload-grid">
+                            <div class="upload-section">
+                                <div class="upload-card">
+                                    <div class="upload-field">
+                                        <label for="uploadVideoFile">영상 파일</label>
+                                        <p class="upload-help-text">MP4 같은 일반 영상 파일을 선택하면 돼.</p>
+                                        <div class="upload-file-box">
+                                            <input type="file" id="uploadVideoFile" accept="video/*" />
+                                            <p class="upload-file-name" id="selectedVideoName">선택된 파일 없음</p>
+                                        </div>
+                                        <div class="upload-file-error-slot"></div>
+                                    </div>
+                                </div>
+
+                                <div class="upload-card">
+                                    <div class="upload-field">
+                                        <label for="uploadThumbnailUrl">썸네일 이미지 주소</label>
+                                        <input
+                                            type="url"
+                                            id="uploadThumbnailUrl"
+                                            class="upload-input"
+                                            placeholder="https://example.com/thumbnail.jpg"
+                                        />
+                                        <div class="upload-error-slot"></div>
+                                    </div>
+
+                                    <div class="upload-field" style="margin-top: 14px;">
+                                        <label for="uploadThumbnailFile">또는 썸네일 파일 선택</label>
+                                        <div class="upload-file-box">
+                                            <input type="file" id="uploadThumbnailFile" accept="image/*" />
+                                        </div>
+                                        <div class="upload-file-error-slot"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="upload-section">
+                                <div class="upload-preview-card">
+                                    <h3 class="upload-preview-title">썸네일 미리보기</h3>
+                                    <div class="upload-thumb-preview">
+                                        <img id="thumbnailPreview" alt="썸네일 미리보기" hidden />
+                                        <div id="thumbnailPreviewEmpty">썸네일을 입력하거나 선택하면 여기서 보여줄게.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- STEP 2 -->
+                    <section class="upload-step-panel" data-step-panel="2">
+                        <h2 class="upload-panel-title">영상 정보를 입력해줘</h2>
+
+                        <div class="upload-grid">
+                            <div class="upload-section">
+                                <div class="upload-card">
+                                    <div class="upload-field">
+                                        <label for="uploadTitle">영상 제목</label>
+                                        <input
+                                            type="text"
+                                            id="uploadTitle"
+                                            class="upload-input"
+                                            placeholder="영상 제목을 입력해줘"
+                                            maxlength="120"
+                                        />
+                                        <div class="upload-error-slot"></div>
+                                    </div>
+
+                                    <div class="upload-field">
+                                        <label for="uploadDescription">영상 설명</label>
+                                        <textarea
+                                            id="uploadDescription"
+                                            class="upload-textarea"
+                                            placeholder="영상 설명을 입력해줘"
+                                        ></textarea>
+                                        <div class="upload-error-slot"></div>
+                                    </div>
+
+                                    <div class="upload-field">
+                                        <label for="uploadCategory">카테고리</label>
+                                        <select id="uploadCategory" class="upload-select">
+                                            <option value="코딩">코딩</option>
+                                            <option value="게임">게임</option>
+                                            <option value="일상">일상</option>
+                                            <option value="음악">음악</option>
+                                            <option value="교육">교육</option>
+                                            <option value="기타">기타</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="upload-card">
+                                    <div class="upload-field">
+                                        <label for="uploadChannel">채널명</label>
+                                        <input
+                                            type="text"
+                                            id="uploadChannel"
+                                            class="upload-input"
+                                            placeholder="채널명을 입력해줘"
+                                            maxlength="60"
+                                        />
+                                        <div class="upload-error-slot"></div>
+                                    </div>
+
+                                    <div class="upload-field">
+                                        <label for="uploadAvatar">채널 프로필 이미지 주소</label>
+                                        <input
+                                            type="url"
+                                            id="uploadAvatar"
+                                            class="upload-input"
+                                            placeholder="https://example.com/avatar.jpg"
+                                        />
+                                    </div>
+
+                                    <div class="upload-field">
+                                        <label for="uploadEmbedUrl">외부 임베드 URL(선택)</label>
+                                        <input
+                                            type="url"
+                                            id="uploadEmbedUrl"
+                                            class="upload-input"
+                                            placeholder="유튜브 링크나 embed 주소를 입력할 수도 있어"
+                                        />
+                                    </div>
+
+                                    <div class="upload-field">
+                                        <label for="uploadDuration">영상 길이</label>
+                                        <input
+                                            type="text"
+                                            id="uploadDuration"
+                                            class="upload-input"
+                                            placeholder="예: 10:32"
+                                            readonly
+                                        />
+                                        <div class="upload-error-slot"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="upload-section">
+                                <div class="upload-summary-card">
+                                    <h3 class="upload-summary-title">입력 중 미리보기</h3>
+                                    <div class="upload-summary-thumb">
+                                        <img id="summaryThumbnail" alt="요약 썸네일" hidden />
+                                        <div id="summaryThumbnailEmpty">아직 선택된 썸네일이 없어.</div>
+                                    </div>
+
+                                    <div class="upload-summary-list">
+                                        <div class="upload-summary-item">
+                                            <span class="upload-summary-label">제목</span>
+                                            <span class="upload-summary-value" id="summaryTitle">미입력</span>
+                                        </div>
+                                        <div class="upload-summary-item">
+                                            <span class="upload-summary-label">채널명</span>
+                                            <span class="upload-summary-value" id="summaryChannel">미입력</span>
+                                        </div>
+                                        <div class="upload-summary-item">
+                                            <span class="upload-summary-label">영상 파일</span>
+                                            <span class="upload-summary-value" id="summaryVideoFile">선택된 파일 없음</span>
+                                        </div>
+                                        <div class="upload-summary-item">
+                                            <span class="upload-summary-label">카테고리</span>
+                                            <span class="upload-summary-value" id="summaryCategory">미선택</span>
+                                        </div>
+                                        <div class="upload-summary-item">
+                                            <span class="upload-summary-label">영상 길이</span>
+                                            <span class="upload-summary-value" id="summaryDuration">미입력</span>
+                                        </div>
+                                        <div class="upload-summary-item">
+                                            <span class="upload-summary-label">공개 설정</span>
+                                            <span class="upload-summary-value" id="summaryVisibility">공개</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- STEP 3 -->
+                    <section class="upload-step-panel" data-step-panel="3">
+                        <h2 class="upload-panel-title">공개 설정을 확인해줘</h2>
+
+                        <div class="upload-grid">
+                            <div class="upload-section">
+                                <div class="upload-card">
+                                    <div class="upload-field">
+                                        <label>공개 범위</label>
+                                        <div class="upload-radio-group">
+                                            <label class="upload-radio-option">
+                                                <input type="radio" name="uploadVisibility" value="공개" checked />
+                                                공개
+                                            </label>
+                                            <label class="upload-radio-option">
+                                                <input type="radio" name="uploadVisibility" value="비공개" />
+                                                비공개
+                                            </label>
+                                            <label class="upload-radio-option">
+                                                <input type="radio" name="uploadVisibility" value="일부 공개" />
+                                                일부 공개
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="upload-card">
+                                    <h3 class="upload-card-title">마지막 체크</h3>
+                                    <p class="upload-help-text" style="margin: 0;">
+                                        제목, 설명, 채널명, 썸네일, 영상 파일이 모두 정상인지 확인한 뒤 업로드를 진행해줘.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="upload-section">
+                                <div class="upload-summary-card">
+                                    <h3 class="upload-summary-title">최종 요약</h3>
+                                    <div class="upload-summary-thumb">
+                                        <img id="summaryThumbnailFinal" src="" alt="" hidden style="display:none;" />
+                                        <img id="summaryThumbnailMirror" alt="최종 썸네일" hidden style="display:none;" />
+                                        <img id="summaryThumbnailClone" alt="최종 썸네일" hidden style="display:none;" />
+                                        <img id="summaryThumbnailLast" alt="최종 썸네일" hidden style="display:none;" />
+                                        <img id="summaryThumbnailReal" alt="최종 썸네일" hidden style="display:none;" />
+                                        <img id="summaryThumbnailKeep" alt="최종 썸네일" hidden style="display:none;" />
+                                        <img id="summaryThumbnailSafe" alt="최종 썸네일" hidden style="display:none;" />
+                                        <img id="summaryThumbnailView" alt="최종 썸네일" hidden style="display:none;" />
+                                        <img id="summaryThumbnailMain" alt="최종 썸네일" hidden />
+                                        <div id="summaryThumbnailEmptyFinal">썸네일 정보가 여기 표시돼.</div>
+                                    </div>
+
+                                    <div class="upload-summary-list">
+                                        <div class="upload-summary-item">
+                                            <span class="upload-summary-label">제목</span>
+                                            <span class="upload-summary-value" id="summaryTitleFinal">미입력</span>
+                                        </div>
+                                        <div class="upload-summary-item">
+                                            <span class="upload-summary-label">채널명</span>
+                                            <span class="upload-summary-value" id="summaryChannelFinal">미입력</span>
+                                        </div>
+                                        <div class="upload-summary-item">
+                                            <span class="upload-summary-label">영상 파일</span>
+                                            <span class="upload-summary-value" id="summaryVideoFileFinal">선택된 파일 없음</span>
+                                        </div>
+                                        <div class="upload-summary-item">
+                                            <span class="upload-summary-label">카테고리</span>
+                                            <span class="upload-summary-value" id="summaryCategoryFinal">미선택</span>
+                                        </div>
+                                        <div class="upload-summary-item">
+                                            <span class="upload-summary-label">영상 길이</span>
+                                            <span class="upload-summary-value" id="summaryDurationFinal">미입력</span>
+                                        </div>
+                                        <div class="upload-summary-item">
+                                            <span class="upload-summary-label">공개 설정</span>
+                                            <span class="upload-summary-value" id="summaryVisibilityFinal">공개</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <div class="upload-actions">
+                        <div class="upload-actions-left">
+                            <a href="index.html" class="upload-cancel">취소</a>
+                        </div>
+
+                        <div class="upload-actions-right">
+                            <button type="button" class="upload-link-btn" id="uploadPrevBtn" style="visibility:hidden;">이전</button>
+                            <button type="button" class="upload-next" id="uploadNextBtn">다음</button>
+                            <button type="submit" class="upload-submit" id="uploadSubmitBtn" hidden>업로드 완료</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script src="auth.js"></script>
+<script src="script.js"></script>
+<script>
+    (function () {
+        const mainSummaryMap = [
+            ["summaryTitle", "summaryTitleFinal"],
+            ["summaryChannel", "summaryChannelFinal"],
+            ["summaryVideoFile", "summaryVideoFileFinal"],
+            ["summaryCategory", "summaryCategoryFinal"],
+            ["summaryDuration", "summaryDurationFinal"],
+            ["summaryVisibility", "summaryVisibilityFinal"]
+        ];
+
+        const previewImg = document.getElementById("summaryThumbnail");
+        const finalImg = document.getElementById("summaryThumbnailMain");
+        const previewEmpty = document.getElementById("summaryThumbnailEmpty");
+        const finalEmpty = document.getElementById("summaryThumbnailEmptyFinal");
+
+        function syncFinalSummary() {
+            mainSummaryMap.forEach(([fromId, toId]) => {
+                const fromEl = document.getElementById(fromId);
+                const toEl = document.getElementById(toId);
+                if (fromEl && toEl) {
+                    toEl.textContent = fromEl.textContent;
+                }
+            });
+
+            if (previewImg && finalImg) {
+                const src = previewImg.getAttribute("src");
+                const isHidden = previewImg.hidden || !src;
+
+                if (!isHidden) {
+                    finalImg.src = src;
+                    finalImg.hidden = false;
+                    if (finalEmpty) finalEmpty.hidden = true;
+                } else {
+                    finalImg.removeAttribute("src");
+                    finalImg.hidden = true;
+                    if (finalEmpty) finalEmpty.hidden = false;
+                }
+            }
+        }
+
+        const observer = new MutationObserver(syncFinalSummary);
+        mainSummaryMap.forEach(([fromId]) => {
+            const el = document.getElementById(fromId);
+            if (el) {
+                observer.observe(el, { childList: true, subtree: true, characterData: true });
+            }
+        });
+
+        if (previewImg) {
+            observer.observe(previewImg, { attributes: true, attributeFilter: ["src", "hidden"] });
+        }
+
+        window.addEventListener("load", syncFinalSummary);
+        document.addEventListener("input", syncFinalSummary);
+        document.addEventListener("change", syncFinalSummary);
+        syncFinalSummary();
+    })();
+</script>
+
+</body>
+</html>

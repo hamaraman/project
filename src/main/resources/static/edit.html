@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YouTube - 영상 수정</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+            href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+            rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+
+    <style>
+        .edit-shell {
+            display: flex;
+            min-height: calc(100vh - 56px);
+        }
+
+        .sidebar {
+            width: 240px;
+            background: #0f0f0f;
+            border-right: 1px solid #222;
+            padding: 12px 10px;
+            position: sticky;
+            top: 56px;
+            height: calc(100vh - 56px);
+            overflow-y: auto;
+            flex-shrink: 0;
+            transition: width 0.22s ease, transform 0.22s ease;
+        }
+
+        .sidebar.is-collapsed {
+            width: 72px;
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+
+        .sidebar-section {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 8px 0;
+            border-bottom: 1px solid #222;
+        }
+
+        .sidebar-section:last-child {
+            border-bottom: none;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            min-height: 40px;
+            padding: 0 12px;
+            border-radius: 10px;
+            color: #f1f1f1;
+            transition: background 0.18s ease;
+        }
+
+        .sidebar-link:hover {
+            background: #222;
+        }
+
+        .sidebar-link.is-active {
+            background: #272727;
+            font-weight: 700;
+        }
+
+        .sidebar-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+
+        .sidebar-label {
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .sidebar.is-collapsed .sidebar-link {
+            justify-content: center;
+            padding: 0;
+            min-height: 64px;
+            flex-direction: column;
+            gap: 6px;
+            border-radius: 12px;
+        }
+
+        .sidebar.is-collapsed .sidebar-label {
+            font-size: 11px;
+            line-height: 1.2;
+            text-align: center;
+        }
+
+        .edit-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .menu-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 999px;
+            background: transparent;
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .menu-btn:hover {
+            background: #222;
+        }
+
+        .menu-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        .topbar-left {
+            gap: 4px;
+        }
+
+        .mobile-sidebar-backdrop {
+            display: none;
+        }
+
+        .edit-page {
+            padding: 28px 32px 40px;
+        }
+
+        .edit-header {
+            margin-bottom: 24px;
+        }
+
+        .edit-header p {
+            margin: 0 0 8px;
+            color: #9aa0a6;
+            font-size: 13px;
+        }
+
+        .edit-header h1 {
+            margin: 0;
+            font-size: 28px;
+            line-height: 1.25;
+        }
+
+        .edit-card {
+            background: #181818;
+            border: 1px solid #272727;
+            border-radius: 22px;
+            padding: 24px;
+        }
+
+        .edit-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 20px;
+        }
+
+        .edit-section {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .edit-field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .edit-field label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #f1f1f1;
+        }
+
+        .edit-input,
+        .edit-select,
+        .edit-textarea {
+            width: 100%;
+            border: 1px solid #303030;
+            background: #121212;
+            color: #fff;
+            border-radius: 14px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .edit-input,
+        .edit-select {
+            height: 46px;
+            padding: 0 14px;
+        }
+
+        .edit-textarea {
+            min-height: 150px;
+            padding: 14px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .edit-radio-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .edit-radio-option {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 40px;
+            padding: 0 14px;
+            border-radius: 999px;
+            border: 1px solid #303030;
+            background: #202020;
+            color: #fff;
+            font-size: 13px;
+        }
+
+        .edit-preview {
+            border: 1px solid #303030;
+            border-radius: 18px;
+            background: #121212;
+            padding: 16px;
+        }
+
+        .edit-preview-title {
+            margin: 0 0 12px;
+            font-size: 15px;
+            color: #f1f1f1;
+        }
+
+        .edit-preview-thumb {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border-radius: 14px;
+            overflow: hidden;
+            background: #0d0d0d;
+            margin-bottom: 14px;
+        }
+
+        .edit-preview-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .edit-preview-meta h3 {
+            margin: 0 0 8px;
+            font-size: 17px;
+            line-height: 1.4;
+        }
+
+        .edit-preview-meta p {
+            margin: 0 0 6px;
+            color: #aaa;
+            font-size: 13px;
+            line-height: 1.55;
+        }
+
+        .edit-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .edit-btn {
+            min-width: 120px;
+            height: 42px;
+            padding: 0 16px;
+            border-radius: 999px;
+            border: 1px solid #303030;
+            background: #202020;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        .edit-btn.primary {
+            background: #fff;
+            color: #111;
+            border-color: #fff;
+            font-weight: 700;
+        }
+
+        @media (max-width: 1000px) {
+            .edit-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                position: fixed;
+                top: 56px;
+                left: 0;
+                width: 240px;
+                height: calc(100vh - 56px);
+                z-index: 120;
+                transform: translateX(-100%);
+                box-shadow: 12px 0 30px rgba(0, 0, 0, 0.35);
+            }
+
+            .sidebar.is-open {
+                transform: translateX(0);
+            }
+
+            .sidebar.is-collapsed {
+                width: 240px;
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+
+            .sidebar.is-collapsed .sidebar-link {
+                justify-content: flex-start;
+                padding: 0 12px;
+                min-height: 40px;
+                flex-direction: row;
+                gap: 16px;
+                border-radius: 10px;
+            }
+
+            .sidebar.is-collapsed .sidebar-label {
+                font-size: 14px;
+                text-align: left;
+            }
+
+            .mobile-sidebar-backdrop {
+                display: block;
+                position: fixed;
+                inset: 56px 0 0 0;
+                background: rgba(0, 0, 0, 0.45);
+                z-index: 110;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.2s ease;
+            }
+
+            .mobile-sidebar-backdrop.is-open {
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            .edit-content {
+                width: 100%;
+            }
+
+            .edit-page {
+                padding: 20px 16px 28px;
+            }
+
+            .edit-card {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+<body data-page="edit">
+<header class="topbar">
+    <div class="topbar-left">
+        <button type="button" class="menu-btn" id="menuToggle" aria-label="메뉴 열기">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 6h18v2H3V6Zm0 5h18v2H3v-2Zm0 5h18v2H3v-2Z"></path>
+            </svg>
+        </button>
+
+        <a href="index.html" class="logo-wrap" aria-label="YouTube 홈">
+            <span class="logo-badge">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M10 15.5v-7l6 3.5-6 3.5Z" fill="#fff"></path>
+                </svg>
+            </span>
+            <span class="logo-text">YouTube</span>
+        </a>
+    </div>
+
+    <div class="topbar-center">
+        <form class="search-form" onsubmit="return false;">
+            <input type="text" placeholder="검색" aria-label="검색" />
+            <button type="submit" class="search-btn" aria-label="검색 버튼">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M10 4a6 6 0 1 0 3.87 10.58l4.27 4.27 1.41-1.41-4.27-4.27A6 6 0 0 0 10 4Zm0 2a4 4 0 1 1 0 8 4 4 0 0 1 0-8Z"></path>
+                </svg>
+            </button>
+        </form>
+    </div>
+
+    <div class="topbar-right">
+        <a href="upload.html" class="icon-btn" aria-label="업로드">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M11 6h2v5h5v2h-5v5h-2v-5H6v-2h5V6Z"></path>
+            </svg>
+        </a>
+        <a href="channel.html" class="profile" aria-label="내 채널">T</a>
+    </div>
+</header>
+
+<div class="mobile-sidebar-backdrop" id="sidebarBackdrop"></div>
+
+<div class="edit-shell">
+    <aside class="sidebar is-collapsed" id="sidebar">
+        <nav class="sidebar-section">
+            <a href="index.html" class="sidebar-link">
+                <span class="sidebar-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M4 10.5 12 4l8 6.5V20h-5v-5h-6v5H4v-9.5Z"></path>
+                    </svg>
+                </span>
+                <span class="sidebar-label">홈</span>
+            </a>
+        </nav>
+
+        <nav class="sidebar-section">
+            <a href="saved.html" class="sidebar-link">
+                <span class="sidebar-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M17 3H7a2 2 0 0 0-2 2v16l7-4 7 4V5a2 2 0 0 0-2-2Z"></path>
+                    </svg>
+                </span>
+                <span class="sidebar-label">저장한 영상</span>
+            </a>
+
+            <a href="liked.html" class="sidebar-link">
+                <span class="sidebar-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="m12 21-1.45-1.32C5.4 15.05 2 11.97 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09A6 6 0 0 1 16.5 3C19.58 3 22 5.42 22 8.5c0 3.47-3.4 6.55-8.55 11.18L12 21Z"></path>
+                    </svg>
+                </span>
+                <span class="sidebar-label">좋아요한 영상</span>
+            </a>
+            <a href="history.html" class="sidebar-link">
+                <span class="sidebar-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="m12 21-1.45-1.32C5.4 15.05 2 11.97 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09A6 6 0 0 1 16.5 3C19.58 3 22 5.42 22 8.5c0 3.47-3.4 6.55-8.55 11.18L12 21Z"></path>
+                    </svg>
+                </span>
+                <span class="sidebar-label">시청 기록</span>
+            </a>
+        </nav>
+
+        <nav class="sidebar-section">
+            <a href="channel.html" class="sidebar-link is-active">
+                <span class="sidebar-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"></path>
+                    </svg>
+                </span>
+                <span class="sidebar-label">내 채널</span>
+            </a>
+
+            <a href="upload.html" class="sidebar-link">
+                <span class="sidebar-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M11 6h2v5h5v2h-5v5h-2v-5H6v-2h5V6Z"></path>
+                    </svg>
+                </span>
+                <span class="sidebar-label">업로드</span>
+            </a>
+        </nav>
+    </aside>
+
+    <main class="edit-content">
+        <section class="edit-page">
+            <div class="edit-header">
+                <p>채널 관리</p>
+                <h1>영상 수정</h1>
+            </div>
+
+            <form id="editForm" class="edit-card">
+                <div class="edit-grid">
+                    <div class="edit-section">
+                        <div class="edit-field">
+                            <label for="editTitle">제목</label>
+                            <input type="text" id="editTitle" class="edit-input" placeholder="영상 제목" />
+                        </div>
+
+                        <div class="edit-field">
+                            <label for="editDescription">설명</label>
+                            <textarea id="editDescription" class="edit-textarea" placeholder="영상 설명"></textarea>
+                        </div>
+
+                        <div class="edit-field">
+                            <label for="editThumbnail">썸네일 이미지 URL</label>
+                            <input type="text" id="editThumbnail" class="edit-input" placeholder="https://..." />
+                        </div>
+
+                        <div class="edit-field">
+                            <label for="editEmbedUrl">임베드 URL</label>
+                            <input type="text" id="editEmbedUrl" class="edit-input" placeholder="https://www.youtube.com/embed/..." />
+                        </div>
+
+                        <div class="edit-field">
+                            <label for="editChannel">채널명</label>
+                            <input type="text" id="editChannel" class="edit-input" placeholder="채널명" />
+                        </div>
+
+                        <div class="edit-field">
+                            <label for="editAvatar">채널 아바타 이미지 URL</label>
+                            <input type="text" id="editAvatar" class="edit-input" placeholder="https://..." />
+                        </div>
+                    </div>
+
+                    <div class="edit-section">
+                        <div class="edit-field">
+                            <label for="editCategory">카테고리</label>
+                            <select id="editCategory" class="edit-select">
+                                <option value="코딩">코딩</option>
+                                <option value="게임">게임</option>
+                                <option value="음악">음악</option>
+                                <option value="브이로그">브이로그</option>
+                                <option value="리뷰">리뷰</option>
+                                <option value="기타">기타</option>
+                            </select>
+                        </div>
+
+                        <div class="edit-field">
+                            <label for="editDuration">영상 길이</label>
+                            <input type="text" id="editDuration" class="edit-input" placeholder="예: 12:34" />
+                        </div>
+
+                        <div class="edit-field">
+                            <label>공개 상태</label>
+                            <div class="edit-radio-group">
+                                <label class="edit-radio-option">
+                                    <input type="radio" name="editVisibility" value="공개" checked />
+                                    공개
+                                </label>
+                                <label class="edit-radio-option">
+                                    <input type="radio" name="editVisibility" value="비공개" />
+                                    비공개
+                                </label>
+                                <label class="edit-radio-option">
+                                    <input type="radio" name="editVisibility" value="일부 공개" />
+                                    일부 공개
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="edit-preview">
+                            <p class="edit-preview-title">미리보기</p>
+                            <div class="edit-preview-thumb">
+                                <img id="editPreviewImage" src="https://via.placeholder.com/1280x720.png?text=Thumbnail" alt="썸네일 미리보기" />
+                            </div>
+                            <div class="edit-preview-meta">
+                                <h3 id="editPreviewTitle">영상 제목 미리보기</h3>
+                                <p id="editPreviewChannel">채널명</p>
+                                <p id="editPreviewDescription">영상 설명 미리보기</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="edit-actions">
+                    <a href="channel.html" class="edit-btn">취소</a>
+                    <button type="submit" id="editSubmitBtn" class="edit-btn primary">수정 저장</button>
+                </div>
+            </form>
+        </section>
+    </main>
+</div>
+
+<script src="auth.js"></script>
+<script src="script.js"></script>
+<script>
+    (function () {
+        const sidebar = document.getElementById("sidebar");
+        const menuToggle = document.getElementById("menuToggle");
+        const backdrop = document.getElementById("sidebarBackdrop");
+
+        if (!sidebar || !menuToggle || !backdrop) return;
+
+        function isMobile() {
+            return window.innerWidth <= 900;
+        }
+
+        function closeMobileSidebar() {
+            sidebar.classList.remove("is-open");
+            backdrop.classList.remove("is-open");
+        }
+
+        function toggleDesktopSidebar() {
+            sidebar.classList.toggle("is-collapsed");
+        }
+
+        menuToggle.addEventListener("click", () => {
+            if (isMobile()) {
+                sidebar.classList.toggle("is-open");
+                backdrop.classList.toggle("is-open");
+            } else {
+                toggleDesktopSidebar();
+            }
+        });
+
+        backdrop.addEventListener("click", closeMobileSidebar);
+
+        window.addEventListener("resize", () => {
+            if (!isMobile()) {
+                closeMobileSidebar();
+            }
+        });
+
+        const titleInput = document.getElementById("editTitle");
+        const descInput = document.getElementById("editDescription");
+        const thumbInput = document.getElementById("editThumbnail");
+
+        const previewTitle = document.getElementById("editPreviewTitle");
+        const previewChannel = document.getElementById("editPreviewChannel");
+        const previewDesc = document.getElementById("editPreviewDescription");
+        const previewImage = document.getElementById("editPreviewImage");
+        const channelInput = document.getElementById("editChannel");
+
+        function syncPreview() {
+            if (previewTitle) {
+                previewTitle.textContent = titleInput?.value.trim() || "영상 제목 미리보기";
+            }
+
+            if (previewChannel) {
+                previewChannel.textContent = channelInput?.value.trim() || "채널명";
+            }
+
+            if (previewDesc) {
+                previewDesc.textContent = descInput?.value.trim() || "영상 설명 미리보기";
+            }
+
+            if (previewImage) {
+                previewImage.src = thumbInput?.value.trim() || "https://via.placeholder.com/1280x720.png?text=Thumbnail";
+            }
+        }
+
+        [titleInput, descInput, thumbInput, channelInput].forEach((el) => {
+            if (!el) return;
+            el.addEventListener("input", syncPreview);
+        });
+
+        syncPreview();
+    })();
+</script>
+</body>
+</html>

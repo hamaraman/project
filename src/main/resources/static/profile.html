@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>프로필 설정</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        .profile-page {
+            min-height: calc(100vh - 56px);
+            padding: 28px 16px 40px;
+        }
+
+        .profile-wrap {
+            max-width: 860px;
+            margin: 0 auto;
+        }
+
+        .profile-card {
+            background: linear-gradient(180deg, #181818 0%, #141414 100%);
+            border: 1px solid #272727;
+            border-radius: 28px;
+            padding: 28px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .profile-avatar-preview {
+            width: 84px;
+            height: 84px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: linear-gradient(135deg, #ff4e45, #ff8a00);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 30px;
+            font-weight: 700;
+            flex-shrink: 0;
+            border: 1px solid #333;
+        }
+
+        .profile-avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .profile-title {
+            margin: 0 0 8px;
+            font-size: 30px;
+            color: #fff;
+        }
+
+        .profile-subtitle {
+            margin: 0;
+            color: #a9a9a9;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .profile-field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .profile-field.full {
+            grid-column: 1 / -1;
+        }
+
+        .profile-field label {
+            font-size: 14px;
+            color: #f1f1f1;
+            font-weight: 500;
+        }
+
+        .profile-input {
+            width: 100%;
+            height: 48px;
+            border: 1px solid #303030;
+            background: #101010;
+            color: #fff;
+            border-radius: 14px;
+            padding: 0 14px;
+            outline: none;
+        }
+
+        .profile-input[readonly] {
+            color: #8b8b8b;
+            background: #151515;
+        }
+
+        .profile-input.is-invalid {
+            border-color: #a33a3a;
+        }
+
+        .profile-help {
+            color: #8f8f8f;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .profile-error {
+            min-height: 20px;
+            color: #ff7b7b;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .profile-success {
+            min-height: 20px;
+            color: #7ce59a;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .profile-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 22px;
+            flex-wrap: wrap;
+        }
+
+        .profile-btn,
+        .profile-link-btn {
+            min-width: 110px;
+            height: 42px;
+            padding: 0 16px;
+            border-radius: 999px;
+            border: 1px solid #303030;
+            background: #202020;
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .profile-btn.primary {
+            background: #fff;
+            color: #111;
+            border-color: #fff;
+            font-weight: 700;
+        }
+
+        @media (max-width: 720px) {
+            .profile-card {
+                padding: 20px;
+                border-radius: 22px;
+            }
+
+            .profile-title {
+                font-size: 24px;
+            }
+
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-actions {
+                flex-direction: column;
+            }
+
+            .profile-btn,
+            .profile-link-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body data-page="profile">
+<header class="topbar">
+    <div class="topbar-left">
+        <a href="index.html" class="logo-wrap" aria-label="YouTube 홈">
+            <span class="logo-badge">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M10 15.5v-7l6 3.5-6 3.5Z" fill="#fff"></path>
+                </svg>
+            </span>
+            <span class="logo-text">YouTube</span>
+        </a>
+    </div>
+    <div class="topbar-center"></div>
+    <div class="topbar-right"></div>
+</header>
+
+<main class="profile-page">
+    <div class="profile-wrap">
+        <section class="profile-card">
+            <div class="profile-header">
+                <div class="profile-avatar-preview" id="profileAvatarPreview">U</div>
+                <div>
+                    <h1 class="profile-title">프로필 설정</h1>
+                    <p class="profile-subtitle">닉네임, 이메일, 채널명, 프로필 이미지를 수정할 수 있어.</p>
+                </div>
+            </div>
+
+            <form id="profileForm" novalidate>
+                <div class="profile-grid">
+                    <div class="profile-field">
+                        <label for="profileUsername">아이디</label>
+                        <input type="text" id="profileUsername" class="profile-input" readonly />
+                        <div class="profile-help">아이디는 여기서 변경할 수 없어.</div>
+                    </div>
+
+                    <div class="profile-field">
+                        <label for="profileNickname">닉네임</label>
+                        <input type="text" id="profileNickname" class="profile-input" maxlength="20" />
+                        <div class="profile-error" id="profileNicknameError"></div>
+                    </div>
+
+                    <div class="profile-field">
+                        <label for="profileEmail">이메일</label>
+                        <input type="email" id="profileEmail" class="profile-input" maxlength="80" />
+                        <div class="profile-error" id="profileEmailError"></div>
+                    </div>
+
+                    <div class="profile-field">
+                        <label for="profileChannelName">채널명</label>
+                        <input type="text" id="profileChannelName" class="profile-input" maxlength="40" />
+                        <div class="profile-error" id="profileChannelNameError"></div>
+                    </div>
+
+                    <div class="profile-field full">
+                        <label for="profileImage">프로필 이미지 URL</label>
+                        <input type="url" id="profileImage" class="profile-input" placeholder="https://example.com/profile.jpg" />
+                        <div class="profile-help">비워두면 기본 이니셜 원형 프로필로 보여줄게.</div>
+                        <div class="profile-error" id="profileImageError"></div>
+                    </div>
+                </div>
+
+                <div class="profile-error" id="profileCommonError"></div>
+                <div class="profile-success" id="profileSuccessMessage"></div>
+
+                <div class="profile-actions">
+                    <a href="channel.html" class="profile-link-btn">내 채널</a>
+                    <button type="submit" class="profile-btn primary" id="profileSubmitBtn">저장</button>
+                </div>
+            </form>
+            <section style="margin-top: 28px; padding-top: 24px; border-top: 1px solid #262626;">
+    <h2 style="margin: 0 0 16px; font-size: 22px; color: #fff;">비밀번호 변경</h2>
+
+    <form id="passwordForm" novalidate>
+        <div class="profile-grid">
+            <div class="profile-field full">
+                <label for="currentPassword">현재 비밀번호</label>
+                <input type="password" id="currentPassword" class="profile-input" maxlength="50" />
+                <div class="profile-error" id="currentPasswordError"></div>
+            </div>
+
+            <div class="profile-field">
+                <label for="newPassword">새 비밀번호</label>
+                <input type="password" id="newPassword" class="profile-input" maxlength="50" />
+                <div class="profile-help">최소 4자 이상 입력해줘.</div>
+                <div class="profile-error" id="newPasswordError"></div>
+            </div>
+
+            <div class="profile-field">
+                <label for="confirmNewPassword">새 비밀번호 확인</label>
+                <input type="password" id="confirmNewPassword" class="profile-input" maxlength="50" />
+                <div class="profile-error" id="confirmNewPasswordError"></div>
+            </div>
+        </div>
+
+        <div class="profile-error" id="passwordCommonError"></div>
+        <div class="profile-success" id="passwordSuccessMessage"></div>
+
+        <div class="profile-actions">
+            <button type="submit" class="profile-btn primary" id="passwordSubmitBtn">비밀번호 변경</button>
+        </div>
+    </form>
+</section>
+        </section>
+    </div>
+</main>
+
+<script src="auth.js"></script>
+</body>
+</html>

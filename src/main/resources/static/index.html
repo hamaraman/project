@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YouTube - 홈</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+        rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+
+    <style>
+        .home-shell {
+            display: flex;
+            min-height: calc(100vh - 56px);
+        }
+
+        .sidebar {
+            width: 240px;
+            background: #0f0f0f;
+            border-right: 1px solid #222;
+            padding: 12px 10px;
+            position: sticky;
+            top: 56px;
+            height: calc(100vh - 56px);
+            overflow-y: auto;
+            flex-shrink: 0;
+            transition: width 0.22s ease, transform 0.22s ease;
+        }
+
+        .sidebar.is-collapsed {
+            width: 72px;
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+
+        .sidebar-section {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 8px 0;
+            border-bottom: 1px solid #222;
+        }
+
+        .sidebar-section:last-child {
+            border-bottom: none;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            min-height: 40px;
+            padding: 0 12px;
+            border-radius: 10px;
+            color: #f1f1f1;
+            transition: background 0.18s ease;
+        }
+
+        .sidebar-link:hover {
+            background: #222;
+        }
+
+        .sidebar-link.is-active {
+            background: #272727;
+            font-weight: 700;
+        }
+
+        .sidebar-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+
+        .sidebar-label {
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .sidebar.is-collapsed .sidebar-link {
+            justify-content: center;
+            padding: 0;
+            min-height: 64px;
+            flex-direction: column;
+            gap: 6px;
+            border-radius: 12px;
+        }
+
+        .sidebar.is-collapsed .sidebar-label {
+            font-size: 11px;
+            line-height: 1.2;
+            text-align: center;
+        }
+
+        .home-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .menu-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 999px;
+            background: transparent;
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .menu-btn:hover {
+            background: #222;
+        }
+
+        .menu-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        .topbar-left {
+            gap: 4px;
+        }
+
+        .mobile-sidebar-backdrop {
+            display: none;
+        }
+
+        .home-hero {
+            margin-bottom: 26px;
+        }
+
+        .home-result-panel {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(180deg, #181818 0%, #141414 100%);
+            border: 1px solid #272727;
+            border-radius: 24px;
+            padding: 24px 24px 22px;
+        }
+
+        .home-result-panel::after {
+            content: "";
+            position: absolute;
+            top: -30px;
+            right: -30px;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.08), rgba(255,255,255,0));
+            pointer-events: none;
+        }
+
+        .home-result-kicker {
+            margin: 0 0 8px;
+            color: #9aa0a6;
+            font-size: 13px;
+            letter-spacing: 0.2px;
+        }
+
+        .home-result-title {
+            margin: 0;
+            font-size: 30px;
+            line-height: 1.25;
+            letter-spacing: -0.4px;
+            color: #fff;
+        }
+
+        .home-result-count {
+            margin: 12px 0 0;
+            color: #b8b8b8;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .home-chip-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 18px;
+        }
+
+        .home-chip {
+            min-height: 36px;
+            padding: 0 14px;
+            border-radius: 999px;
+            border: 1px solid #303030;
+            background: #202020;
+            color: #f1f1f1;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .home-chip.accent {
+            background: #fff;
+            color: #111;
+            border-color: #fff;
+            font-weight: 700;
+        }
+
+        .home-empty-state {
+            margin-top: 22px;
+            padding: 48px 24px;
+            border: 1px solid #272727;
+            border-radius: 22px;
+            background: linear-gradient(180deg, #181818, #151515);
+            text-align: center;
+        }
+
+        .home-empty-icon {
+            width: 74px;
+            height: 74px;
+            margin: 0 auto 18px;
+            border-radius: 50%;
+            background: #202020;
+            border: 1px solid #2e2e2e;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .home-empty-icon svg {
+            width: 34px;
+            height: 34px;
+            fill: #9aa0a6;
+        }
+
+        .home-empty-title {
+            margin: 0 0 10px;
+            font-size: 22px;
+            color: #fff;
+        }
+
+        .home-empty-text {
+            margin: 0;
+            color: #9aa0a6;
+            font-size: 15px;
+            line-height: 1.75;
+        }
+
+        .home-empty-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 22px;
+        }
+
+        .home-empty-btn {
+            min-width: 120px;
+            height: 40px;
+            padding: 0 16px;
+            border-radius: 999px;
+            border: 1px solid #303030;
+            background: #202020;
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .home-empty-btn.primary {
+            background: #fff;
+            color: #111;
+            border-color: #fff;
+            font-weight: 700;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                position: fixed;
+                top: 56px;
+                left: 0;
+                width: 240px;
+                height: calc(100vh - 56px);
+                z-index: 120;
+                transform: translateX(-100%);
+                box-shadow: 12px 0 30px rgba(0, 0, 0, 0.35);
+            }
+
+            .sidebar.is-open {
+                transform: translateX(0);
+            }
+
+            .sidebar.is-collapsed {
+                width: 240px;
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+
+            .sidebar.is-collapsed .sidebar-link {
+                justify-content: flex-start;
+                padding: 0 12px;
+                min-height: 40px;
+                flex-direction: row;
+                gap: 16px;
+                border-radius: 10px;
+            }
+
+            .sidebar.is-collapsed .sidebar-label {
+                font-size: 14px;
+                text-align: left;
+            }
+
+            .mobile-sidebar-backdrop {
+                display: block;
+                position: fixed;
+                inset: 56px 0 0 0;
+                background: rgba(0, 0, 0, 0.45);
+                z-index: 110;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.2s ease;
+            }
+
+            .mobile-sidebar-backdrop.is-open {
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            .home-content {
+                width: 100%;
+            }
+
+            .home-result-panel {
+                padding: 20px 18px 18px;
+                border-radius: 20px;
+            }
+
+            .home-result-title {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .home-result-title {
+                font-size: 21px;
+            }
+
+            .home-empty-state {
+                padding: 38px 18px;
+            }
+
+            .home-empty-title {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body data-page="home">
+<header class="topbar">
+    <div class="topbar-left">
+        <button type="button" class="menu-btn" id="menuToggle" aria-label="메뉴 열기">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 6h18v2H3V6Zm0 5h18v2H3v-2Zm0 5h18v2H3v-2Z"></path>
+            </svg>
+        </button>
+
+        <a href="index.html" class="logo-wrap" aria-label="YouTube 홈">
+            <span class="logo-badge">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M10 15.5v-7l6 3.5-6 3.5Z" fill="#fff"></path>
+                </svg>
+            </span>
+            <span class="logo-text">YouTube</span>
+        </a>
+    </div>
+
+    <div class="topbar-center">
+        <form class="search-form" id="homeSearchForm">
+            <input
+                type="text"
+                id="homeSearchInput"
+                placeholder="검색"
+                aria-label="검색"
+            />
+            <button type="submit" class="search-btn" aria-label="검색 버튼">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M10 4a6 6 0 1 0 3.87 10.58l4.27 4.27 1.41-1.41-4.27-4.27A6 6 0 0 0 10 4Zm0 2a4 4 0 1 1 0 8 4 4 0 0 1 0-8Z"></path>
+                </svg>
+            </button>
+        </form>
+    </div>
+
+    <div class="topbar-right">
+        <a href="upload.html" class="icon-btn" aria-label="업로드">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M11 6h2v5h5v2h-5v5h-2v-5H6v-2h5V6Z"></path>
+            </svg>
+        </a>
+        <a href="channel.html" class="profile" aria-label="내 채널">T</a>
+    </div>
+</header>
+
+<div class="mobile-sidebar-backdrop" id="sidebarBackdrop"></div>
+
+<div class="home-shell">
+    <aside class="sidebar is-collapsed" id="sidebar">
+        <nav class="sidebar-section">
+            <a href="index.html" class="sidebar-link is-active">
+                <span class="sidebar-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M4 10.5 12 4l8 6.5V20h-5v-5h-6v5H4v-9.5Z"></path>
+                    </svg>
+                </span>
+                <span class="sidebar-label">홈</span>
+            </a>
+        </nav>
+
+        <nav class="sidebar-section">
+            <a href="saved.html" class="sidebar-link">
+                <span class="sidebar-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M17 3H7a2 2 0 0 0-2 2v16l7-4 7 4V5a2 2 0 0 0-2-2Z"></path>
+                    </svg>
+                </span>
+                <span class="sidebar-label">저장한 영상</span>
+            </a>
+
+            <a href="liked.html" class="sidebar-link">
+                <span class="sidebar-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="m12 21-1.45-1.32C5.4 15.05 2 11.97 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09A6 6 0 0 1 16.5 3C19.58 3 22 5.42 22 8.5c0 3.47-3.4 6.55-8.55 11.18L12 21Z"></path>
+                    </svg>
+                </span>
+                <span class="sidebar-label">좋아요한 영상</span>
+            </a>
+            <a href="history.html" class="sidebar-link">
+                <span class="sidebar-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="m12 21-1.45-1.32C5.4 15.05 2 11.97 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09A6 6 0 0 1 16.5 3C19.58 3 22 5.42 22 8.5c0 3.47-3.4 6.55-8.55 11.18L12 21Z"></path>
+                    </svg>
+                </span>
+                <span class="sidebar-label">시청 기록</span>
+            </a>
+        </nav>
+
+        <nav class="sidebar-section">
+            <a href="channel.html" class="sidebar-link">
+                <span class="sidebar-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"></path>
+                    </svg>
+                </span>
+                <span class="sidebar-label">내 채널</span>
+            </a>
+
+            <a href="upload.html" class="sidebar-link">
+                <span class="sidebar-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M11 6h2v5h5v2h-5v5h-2v-5H6v-2h5V6Z"></path>
+                    </svg>
+                </span>
+                <span class="sidebar-label">업로드</span>
+            </a>
+        </nav>
+    </aside>
+
+    <main class="main home-content">
+        <section class="home-hero">
+            <div class="home-result-panel">
+                <p class="home-result-kicker" id="homeResultKicker">추천 영상</p>
+                <h1 class="home-result-title" id="homeResultTitle">지금 볼만한 영상</h1>
+                <p class="home-result-count" id="homeResultCount">전체 영상 0개</p>
+
+                <div class="home-chip-row">
+                    <span class="home-chip accent">맞춤 추천</span>
+                    <span class="home-chip">업로드 영상 포함</span>
+                    <span class="home-chip">검색 지원</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="video-grid" id="videoGrid"></section>
+
+        <section class="home-empty-state" id="homeEmptyState" hidden>
+            <div class="home-empty-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M10 4a6 6 0 1 0 3.87 10.58l4.27 4.27 1.41-1.41-4.27-4.27A6 6 0 0 0 10 4Zm0 2a4 4 0 1 1 0 8 4 4 0 0 1 0-8Z"></path>
+                </svg>
+            </div>
+            <h3 class="home-empty-title">검색 결과가 없습니다</h3>
+            <p class="home-empty-text">
+                다른 검색어로 다시 시도하거나 홈으로 돌아가서 영상을 둘러봐.
+            </p>
+            <div class="home-empty-actions">
+                <a href="index.html" class="home-empty-btn primary">홈으로 가기</a>
+                <a href="upload.html" class="home-empty-btn">영상 업로드</a>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script src="auth.js"></script>
+<script src="script.js"></script>
+<script>
+    (function () {
+        const sidebar = document.getElementById("sidebar");
+        const menuToggle = document.getElementById("menuToggle");
+        const backdrop = document.getElementById("sidebarBackdrop");
+
+        if (!sidebar || !menuToggle || !backdrop) return;
+
+        function isMobile() {
+            return window.innerWidth <= 900;
+        }
+
+        function closeMobileSidebar() {
+            sidebar.classList.remove("is-open");
+            backdrop.classList.remove("is-open");
+        }
+
+        function toggleDesktopSidebar() {
+            sidebar.classList.toggle("is-collapsed");
+        }
+
+        menuToggle.addEventListener("click", () => {
+            if (isMobile()) {
+                sidebar.classList.toggle("is-open");
+                backdrop.classList.toggle("is-open");
+            } else {
+                toggleDesktopSidebar();
+            }
+        });
+
+        backdrop.addEventListener("click", closeMobileSidebar);
+
+        window.addEventListener("resize", () => {
+            if (!isMobile()) {
+                closeMobileSidebar();
+            }
+        });
+    })();
+</script>
+</body>
+</html>
